@@ -190,7 +190,8 @@ Array of question objects. Each question may have:
 ## Data privacy
 
 - All answers are stored **only in JavaScript memory** during the browser session.
-- No data is sent to any server.
+- **Questionnaire answers** are not transmitted to any server; all answers stay in JavaScript memory only.
+- Third-party resources (e.g., Google Fonts) are loaded from external servers; no questionnaire data is included in those requests.
 - No cookies or localStorage are used by default.
 - When the tab is closed, all data is lost.
 - The JSON export button allows saving a local file for prototype/testing purposes only.

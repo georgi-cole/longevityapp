@@ -373,9 +373,25 @@ function validateAnswer(question, answer) {
 
 // ── Answer handler ───────────────────────────────────────────────────────────
 
+function recomputeDerivedState() {
+  // Reset all derived state so previous answers don't accumulate on edits/Back navigation
+  state.tags = new Set();
+  state.domainScores = {};
+  state.domainReasons = {};
+  state.recommendedPackages = {};
+  state.redFlags = [];
+  state.safetyNotes = [];
+  state.physicianFirstRequired = false;
+
+  // Re-run scoring for every currently stored answer
+  Object.entries(state.answers).forEach(([qId, ans]) => {
+    evaluateScoring(qId, ans);
+  });
+}
+
 function handleAnswer(questionId, answer) {
   state.answers[questionId] = answer;
-  evaluateScoring(questionId, answer);
+  recomputeDerivedState();
   evaluateTriggerRules(questionId);
 }
 
@@ -385,6 +401,12 @@ function goNext() {
   const currentId = state.activeQuestionQueue[state.currentQuestionIndex];
   const question = getQuestionById(currentId);
   if (!question) return;
+
+  // For lab_values, persist an empty object if no fields were filled so that
+  // scoring rules like { type: 'all_empty' } can run.
+  if (question.type === 'lab_values' && state.answers[currentId] === undefined) {
+    handleAnswer(currentId, {});
+  }
 
   const answer = state.answers[currentId];
 
@@ -1030,7 +1052,7 @@ function attachQuestionListeners(question) {
       const newEntry = {};
       (q.fields || []).forEach(f => { newEntry[f.id] = ''; });
       entries.push(newEntry);
-      state.answers[qid] = entries;
+      handleAnswer(qid, entries);
       // Re-render just the repeatable group
       const entriesContainer = el(`#entries-${qid}`);
       if (entriesContainer) {
@@ -1078,7 +1100,7 @@ function attachRepeatableListeners(question) {
       const entries = Array.isArray(state.answers[question.id]) ? [...state.answers[question.id]] : [];
       if (!entries[idx]) entries[idx] = {};
       entries[idx][field] = inp.value;
-      state.answers[question.id] = entries;
+      handleAnswer(question.id, entries);
     });
   });
 
@@ -1088,7 +1110,7 @@ function attachRepeatableListeners(question) {
       const idx = parseInt(btn.dataset.idx, 10);
       const entries = Array.isArray(state.answers[question.id]) ? [...state.answers[question.id]] : [];
       entries.splice(idx, 1);
-      state.answers[question.id] = entries;
+      handleAnswer(question.id, entries);
       const entriesContainer = el(`#entries-${question.id}`);
       if (entriesContainer) {
         entriesContainer.innerHTML = entries.map((e, i) => renderRepeatableEntry(question, e, i)).join('');
@@ -1167,7 +1189,9 @@ function restoreAnswer(question) {
 function renderPatientCompletionScreen() {
   const view = el('#view-intake');
   const completionView = el('#view-patient-complete');
+  const progressWrapper = el('#progress-wrapper');
   if (view) view.hidden = true;
+  if (progressWrapper) progressWrapper.hidden = true;
   if (completionView) completionView.hidden = false;
 
   const categories = buildPatientFacingCategories();
@@ -1443,8 +1467,8 @@ function initApp() {
   state.activeQuestionQueue = getModuleQuestions('core').map(q => q.id);
   state.currentQuestionIndex = 0;
 
-  // Baseline longevity package suggested for everyone unless physician_first_required
-  addPackage('baseline_longevity', 'suggested', 'Базова оценка за всички клиенти');
+  // baseline_longevity is added conditionally in buildClinicianSummary()
+  // (suppressed when physicianFirstRequired is true), so don't pre-add it here.
 
   // Wire up Next / Back buttons
   el('#btn-next')?.addEventListener('click', goNext);
