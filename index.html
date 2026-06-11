@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Longevity Intake</title>
+  <meta name="description" content="Клинична входна анкета за Longevity консултация. Събира структурирана информация за подготовка на персонализирана оценка." />
+  <meta name="robots" content="noindex, nofollow" />
+
+  <!-- Preconnect for Inter font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- ── Site header ───────────────────────────────────────────────────── -->
+    <header class="site-header">
+      <a href="#" class="logo" aria-label="Smart Longevity Intake — начало">
+        <div class="logo-icon" aria-hidden="true">⬡</div>
+        <span class="logo-text">Smart <span>Longevity</span> Intake</span>
+      </a>
+      <span class="header-badge">Прототип — не за клинична употреба</span>
+    </header>
+
+    <!-- ── Progress bar (visible only during intake) ─────────────────────── -->
+    <div class="progress-wrapper" id="progress-wrapper" aria-label="Напредък в анкетата">
+      <span class="module-label" id="module-label" aria-live="polite"></span>
+      <div class="progress-bar-track" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="progress-bar">
+        <div class="progress-bar-fill" id="progress-bar-fill"></div>
+      </div>
+      <span class="progress-label" id="progress-label">1 / 1</span>
+    </div>
+
+    <!-- ── Main ─────────────────────────────────────────────────────────── -->
+    <main class="main-content" id="main">
+
+      <!-- VIEW 1: Intake flow ─────────────────────────────────────────────── -->
+      <section id="view-intake" aria-label="Анкета">
+        <!-- Validation errors -->
+        <div id="validation-errors" role="alert" aria-live="assertive" hidden></div>
+
+        <!-- Current question renders here -->
+        <div id="question-container" aria-live="polite"></div>
+
+        <!-- Navigation -->
+        <nav class="nav-buttons" aria-label="Навигация в анкетата">
+          <button type="button" id="btn-back" class="btn-secondary" style="display:none">← Назад</button>
+          <button type="button" id="btn-next" class="btn-primary">Напред →</button>
+        </nav>
+      </section>
+
+      <!-- VIEW 2: Patient completion screen ──────────────────────────────── -->
+      <section id="view-patient-complete" aria-label="Завършена анкета" hidden>
+        <!-- Populated by renderPatientCompletionScreen() -->
+      </section>
+
+      <!-- VIEW 3: Clinician summary ──────────────────────────────────────── -->
+      <section id="view-clinician" aria-label="Клинично обобщение" hidden>
+        <div class="clinician-header">
+          <h1>🩺 Клинично обобщение</h1>
+          <div class="clinician-actions">
+            <button type="button" id="btn-back-to-patient" class="btn-secondary">← Назад</button>
+            <button type="button" id="btn-export-json" class="btn-export">⬇ Изтегли JSON</button>
+          </div>
+        </div>
+        <div id="clinician-content">
+          <!-- Populated by renderClinicianSummary() -->
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ── Footer ───────────────────────────────────────────────────────── -->
+    <footer class="site-footer">
+      <p>Smart Longevity Intake е прототип. Не съхранява данни. Отговорите не се изпращат на сървър (страницата зарежда шрифтове от Google Fonts). Не е медицинско устройство и не поставя диагнози.</p>
+    </footer>
+
+  </div><!-- /#app -->
+
+  <!-- Question bank must load before app.js -->
+  <script src="questionBank.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
