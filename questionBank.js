@@ -944,11 +944,11 @@ const questionBank = {
 
     {
       id: 'q_bp_status',
-      module: 'cardiometabolic',
+      module: 'core',
       type: 'single_choice',
       label: 'Кръвно налягане',
-      text: 'Знаете ли приблизителните стойности на кръвното Ви налягане?',
-      helpText: 'Ако не знаете точните стойности, изберете „Не знам".',
+      text: 'Знаете ли приблизително последното си кръвно налягане?',
+      helpText: 'Това е основен intake въпрос. Ако не знаете точните стойности, изберете „Не знам".',
       required: false,
       options: [
         { value: 'normal',   label: 'Нормално (< 130/80)' },
@@ -963,6 +963,7 @@ const questionBank = {
           points: 2,
           tags: ['hypertension_reported'],
           packages: ['cardiometabolic_standard'],
+          triggerModules: ['cardiometabolic', 'renal', 'sleep'],
           reason: 'Съобщено повишено кръвно налягане (≥ 140/90)',
         },
         {
@@ -970,6 +971,8 @@ const questionBank = {
           domain: 'cardiometabolic_risk',
           points: 1,
           tags: ['prehypertension'],
+          packages: ['cardiometabolic_standard'],
+          triggerModules: ['cardiometabolic'],
           reason: 'Леко повишено кръвно налягане',
         },
       ],
@@ -981,7 +984,7 @@ const questionBank = {
 
     {
       id: 'q_bp_values',
-      module: 'cardiometabolic',
+      module: 'core',
       type: 'lab_values',
       label: 'Стойности на кръвното налягане',
       text: 'Въведете типичните стойности на кръвното Ви налягане (ако знаете):',
@@ -1156,11 +1159,11 @@ const questionBank = {
 
     {
       id: 'q_snoring',
-      module: 'sleep',
+      module: 'core',
       type: 'yes_no',
       label: 'Хъркане',
-      text: 'Хъркате ли или сте уведомявани за паузи в дишането по време на сън?',
-      helpText: 'Тази информация насочва към оценка за сънна апнея.',
+      text: 'Някой казвал ли Ви е, че хъркате силно или че спирате да дишате по време на сън?',
+      helpText: 'Тази информация отваря sleep модула само когато има логическа причина за оценка на съня.',
       required: false,
       scoring: [
         {
@@ -1169,7 +1172,7 @@ const questionBank = {
           points: 2,
           tags: ['snoring_apnea_possible'],
           packages: ['sleep_assessment'],
-          triggerModules: ['cardiometabolic'],
+          triggerModules: ['sleep', 'cardiometabolic'],
           reason: 'Хъркане / потенциална сънна апнея',
         },
       ],
