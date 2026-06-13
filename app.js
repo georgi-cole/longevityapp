@@ -352,10 +352,12 @@ function validateAnswer(question, answer) {
     const count = previous && previous.value === valueKey ? previous.count : 0;
     if (count === 0) {
       state.validationWarnings[question.id] = { value: valueKey, count: 1 };
-      errors.push(question.validation.message || 'Моля, проверете стойността. Изглежда необичайна.');
+      errors.push(
+        question.validation.message
+        || 'Моля, проверете стойността. Изглежда необичайна. Натиснете Напред още веднъж, за да потвърдите и продължите.'
+      );
     } else if (count === 1) {
       state.validationWarnings[question.id] = { value: valueKey, count: 2 };
-      errors.push('На път сте да потвърдите тази стойност. Моля, натиснете Напред, за да продължите, или коригирайте стойността.');
     }
   }
 
@@ -639,6 +641,15 @@ function finishQuestionnaire() {
   // Mark all opened modules as completed
   state.openedModules.forEach(m => state.completedModules.add(m));
   state.completedModules.add('core');
+  const params = new URLSearchParams(window.location.search);
+  const clinicianViewRequested = params.get('view') === 'clinician';
+
+  if (clinicianViewRequested) {
+    state.currentView = 'clinician';
+    renderClinicianSummary();
+    return;
+  }
+
   state.currentView = 'patient_complete';
   renderPatientCompletionScreen();
 }
