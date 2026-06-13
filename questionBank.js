@@ -1,4 +1,4 @@
-// questionBank.js — Smart Longevity Intake
+// questionBank.js - Smart Longevity Intake
 // Source of truth for all questions, modules, packages, scoring rules and trigger rules.
 // Edit this file to add/modify/remove questions, modules or packages.
 
@@ -97,9 +97,9 @@ const questionBank = {
     {
       id: 'tr_cardio_goal',
       sourceQuestion: 'q_goals',
-      condition: { type: 'includes', value: 'cardiovascular_prevention' },
+      condition: { type: 'includes', value: 'general_longevity' },
       triggerModules: ['cardiometabolic'],
-      reason: 'Цел: сърдечно-съдова профилактика',
+      reason: 'Цел: разбиране на индивидуалните рискови фактори',
     },
     {
       id: 'tr_cardio_smoking',
@@ -125,9 +125,9 @@ const questionBank = {
     {
       id: 'tr_meta_goal',
       sourceQuestion: 'q_goals',
-      condition: { type: 'includes', value: 'body_composition' },
+      condition: { type: 'includes_any', values: ['body_composition', 'metabolic_flexibility'] },
       triggerModules: ['metabolic'],
-      reason: 'Цел: телесен състав',
+      reason: 'Цел: телесен състав / метаболитна гъвкавост',
     },
     {
       id: 'tr_meta_liver',
@@ -139,9 +139,9 @@ const questionBank = {
     {
       id: 'tr_sleep_goal',
       sourceQuestion: 'q_goals',
-      condition: { type: 'includes_any', values: ['sleep_recovery', 'stress_management'] },
+      condition: { type: 'includes', value: 'sleep_recovery' },
       triggerModules: ['sleep'],
-      reason: 'Цел: сън / стрес',
+      reason: 'Цел: възстановяване и сън',
     },
     {
       id: 'tr_sleep_stress_scale',
@@ -167,9 +167,9 @@ const questionBank = {
     {
       id: 'tr_gut_goal',
       sourceQuestion: 'q_goals',
-      condition: { type: 'includes', value: 'gut_microbiome' },
+      condition: { type: 'includes', value: 'healthspan_strategy' },
       triggerModules: ['gut'],
-      reason: 'Цел: микробиом',
+      reason: 'Цел: персонализирана healthspan стратегия',
     },
     {
       id: 'tr_gut_autoimmune',
@@ -188,9 +188,9 @@ const questionBank = {
     {
       id: 'tr_hormone_goal',
       sourceQuestion: 'q_goals',
-      condition: { type: 'includes_any', values: ['hormone_balance', 'sexual_health'] },
+      condition: { type: 'includes_any', values: ['biological_age', 'aging_markers'] },
       triggerModules: ['hormone'],
-      reason: 'Цел: хормонален баланс / сексуално здраве',
+      reason: 'Цел: биологична възраст / маркери на стареене',
     },
     {
       id: 'tr_hormone_thyroid',
@@ -202,9 +202,9 @@ const questionBank = {
     {
       id: 'tr_cancer_goal',
       sourceQuestion: 'q_goals',
-      condition: { type: 'includes', value: 'cancer_prevention' },
+      condition: { type: 'includes', value: 'general_longevity' },
       triggerModules: ['cancer_family'],
-      reason: 'Цел: онкологична профилактика',
+      reason: 'Цел: разбиране на индивидуалните рискови фактори',
     },
     {
       id: 'tr_cancer_history',
@@ -230,9 +230,9 @@ const questionBank = {
     {
       id: 'tr_mito_goal',
       sourceQuestion: 'q_goals',
-      condition: { type: 'includes_any', values: ['vo2_fitness', 'muscle_performance'] },
+      condition: { type: 'includes_any', values: ['energy_vitality', 'muscle_performance'] },
       triggerModules: ['mitochondrial'],
-      reason: 'Цел: фитнес / мускули',
+      reason: 'Цел: енергия / мускулна функционалност',
     },
     {
       id: 'tr_renal_condition',
@@ -273,7 +273,7 @@ const questionBank = {
       type: 'info',
       label: 'Добре дошли',
       text: 'Добре дошли в Smart Longevity Intake',
-      helpText: 'Тази анкета ни помага да подготвим персонализирана оценка за Вашето здраве преди първата консултация. Отговорите Ви се запазват само в браузъра по време на тази сесия — никакви данни не се изпращат или съхраняват. Ще отнеме около 10–15 минути.',
+      helpText: 'Вашите отговори ще помогнат на нашия екип да изгради цялостен профил на здравния Ви статус, рисковите фактори и целите Ви, за да подготви персонализирани препоръки по време на консултацията.',
       required: false,
     },
 
@@ -403,76 +403,41 @@ const questionBank = {
       helpText: 'Изберете всички, които се отнасят за Вас. Нашият екип ще фокусира оценката именно върху тях.',
       required: true,
       options: [
-        { value: 'general_longevity',        label: 'Обща превенция и дълголетие' },
-        { value: 'cardiovascular_prevention', label: 'Сърдечно-съдова профилактика' },
-        { value: 'body_composition',          label: 'Телесен състав и метаболизъм' },
-        { value: 'sleep_recovery',            label: 'Сън и възстановяване' },
-        { value: 'stress_management',         label: 'Управление на стреса' },
-        { value: 'gut_microbiome',            label: 'Микробиом и храносмилане' },
-        { value: 'hormone_balance',           label: 'Хормонален баланс' },
-        { value: 'sexual_health',             label: 'Сексуално здраве' },
-        { value: 'vo2_fitness',               label: 'Фитнес и VO2 max' },
-        { value: 'muscle_performance',        label: 'Мускулна маса и сила' },
-        { value: 'cancer_prevention',         label: 'Онкологична профилактика' },
-        { value: 'brain_cognitive',           label: 'Мозъчна функция и когниция' },
-        { value: 'other',                     label: 'Друго' },
+        { value: 'energy_vitality',     label: 'Повече енергия и жизненост' },
+        { value: 'sleep_recovery',      label: 'По-добро възстановяване и сън' },
+        { value: 'body_composition',    label: 'Оптимизиране на телесния състав' },
+        { value: 'metabolic_flexibility', label: 'Подобряване на метаболитната гъвкавост' },
+        { value: 'muscle_performance',  label: 'Запазване на сила, мускулна маса и функционалност' },
+        { value: 'general_longevity',   label: 'Разбиране на индивидуалните ми рискови фактори' },
+        { value: 'biological_age',      label: 'Измерване и проследяване на биологичната ми възраст' },
+        { value: 'aging_markers',       label: 'Подобряване на показателите, свързани с биологичното стареене' },
+        { value: 'healthspan_strategy', label: 'Персонализирана стратегия за дълголетие и функционално здраве (healthspan)' },
+        { value: 'other',               label: 'Друго', freeText: true, freeTextLabel: 'Моля, опишете целта си:' },
       ],
       scoring: [
         {
-          condition: { type: 'includes', value: 'cardiovascular_prevention' },
-          domain: 'cardiometabolic_risk',
-          points: 1,
-          packages: ['cardiometabolic_standard'],
-          triggerModules: ['cardiometabolic'],
-          reason: 'Цел: сърдечно-съдова профилактика',
-        },
-        {
-          condition: { type: 'includes', value: 'body_composition' },
+          condition: { type: 'includes_any', values: ['body_composition', 'metabolic_flexibility'] },
           domain: 'metabolic_risk',
           points: 1,
           packages: ['metabolic_standard'],
           triggerModules: ['metabolic'],
-          reason: 'Цел: телесен състав',
+          reason: 'Цел: телесен състав / метаболитна гъвкавост',
         },
         {
-          condition: { type: 'includes_any', values: ['sleep_recovery', 'stress_management'] },
+          condition: { type: 'includes', value: 'sleep_recovery' },
           domain: 'sleep_risk',
           points: 1,
           packages: ['sleep_assessment'],
           triggerModules: ['sleep'],
-          reason: 'Цел: сън / стрес',
+          reason: 'Цел: възстановяване и сън',
         },
         {
-          condition: { type: 'includes', value: 'gut_microbiome' },
-          domain: 'gut_risk',
-          points: 1,
-          packages: ['gut_microbiome'],
-          triggerModules: ['gut'],
-          reason: 'Цел: микробиом',
-        },
-        {
-          condition: { type: 'includes_any', values: ['hormone_balance', 'sexual_health'] },
-          domain: 'hormone_risk',
-          points: 1,
-          packages: ['hormone_standard'],
-          triggerModules: ['hormone'],
-          reason: 'Цел: хормони / сексуално здраве',
-        },
-        {
-          condition: { type: 'includes', value: 'cancer_prevention' },
-          domain: 'cancer_risk',
-          points: 1,
-          packages: ['cancer_prevention'],
-          triggerModules: ['cancer_family'],
-          reason: 'Цел: онкологична профилактика',
-        },
-        {
-          condition: { type: 'includes_any', values: ['vo2_fitness', 'muscle_performance'] },
+          condition: { type: 'includes_any', values: ['energy_vitality', 'muscle_performance'] },
           domain: 'mitochondrial_risk',
           points: 1,
           packages: ['mitochondrial_assessment'],
           triggerModules: ['mitochondrial'],
-          reason: 'Цел: фитнес / мускулна маса',
+          reason: 'Цел: енергия / мускулна функционалност',
         },
       ],
     },
@@ -498,6 +463,7 @@ const questionBank = {
         { value: 'cancer_history',      label: 'Онкологично заболяване (в миналото или настоящо)' },
         { value: 'mental_health',       label: 'Диагностицирано психично-здравно заболяване' },
         { value: 'sleep_apnea',         label: 'Сънна апнея (диагностицирана)' },
+        { value: 'other',               label: 'Друго', freeText: true, freeTextLabel: 'Моля, уточнете диагнозата или състоянието:' },
         { value: 'none', label: 'Нямам нито едно от изброените', exclusive: true },
       ],
       scoring: [
@@ -555,7 +521,7 @@ const questionBank = {
           points: 3,
           tags: ['kidney_disease', 'kidney_review_required'],
           packages: ['renal_assessment'],
-          safetyNote: 'Хронична бъбречна болест — прегледайте дозировки и контраиндикации.',
+          safetyNote: 'Хронична бъбречна болест - прегледайте дозировки и контраиндикации.',
           reason: 'Хронична бъбречна болест',
         },
         {
@@ -563,7 +529,7 @@ const questionBank = {
           domain: 'metabolic_risk',
           points: 2,
           tags: ['liver_disease'],
-          safetyNote: 'Чернодробна болест — чернодробен метаболизъм и лекарствени взаимодействия.',
+          safetyNote: 'Чернодробна болест - чернодробен метаболизъм и лекарствени взаимодействия.',
           reason: 'Чернодробна болест',
         },
         {
@@ -572,7 +538,7 @@ const questionBank = {
           points: 4,
           tags: ['heart_disease', 'red_flag'],
           packages: ['cardiometabolic_extended'],
-          safetyNote: 'Установено сърдечно заболяване — необходима кардиологична оценка преди програма.',
+          safetyNote: 'Установено сърдечно заболяване - необходима кардиологична оценка преди програма.',
           redFlag: true,
           reason: 'Известно сърдечно заболяване',
         },
@@ -582,7 +548,7 @@ const questionBank = {
           points: 4,
           tags: ['cancer_history', 'red_flag'],
           packages: ['cancer_prevention'],
-          safetyNote: 'Лична онкологична история — необходима специализирана консултация.',
+          safetyNote: 'Лична онкологична история - необходима специализирана консултация.',
           redFlag: true,
           reason: 'Лична онкологична история',
         },
@@ -615,7 +581,7 @@ const questionBank = {
         {
           condition: { type: 'has_entries' },
           tags: ['medication_review_required'],
-          safetyNote: 'Активна медикация — преглед на взаимодействия и съвместимост.',
+          safetyNote: 'Активна медикация - преглед на взаимодействия и съвместимост.',
           reason: 'Активна употреба на медикаменти',
         },
       ],
@@ -638,7 +604,7 @@ const questionBank = {
         {
           condition: { type: 'has_entries' },
           tags: ['supplement_review_required'],
-          safetyNote: 'Активна употреба на добавки — преглед на взаимодействия.',
+          safetyNote: 'Активна употреба на добавки - преглед на взаимодействия.',
           reason: 'Активна употреба на добавки',
         },
       ],
@@ -654,9 +620,12 @@ const questionBank = {
       required: true,
       options: [
         { value: 'never',      label: 'Никога не съм пушил/а' },
-        { value: 'former',     label: 'Бивш/а пушач — спрял/а' },
+        { value: 'former',     label: 'Бивш/а пушач - спрял/а' },
         { value: 'current',    label: 'Настоящ/а пушач' },
         { value: 'occasional', label: 'Случайно (социален пушач)' },
+      ],
+      followUps: [
+        { ifValue: 'current', questions: ['q_smoking_cigarettes'] },
       ],
       scoring: [
         {
@@ -678,6 +647,19 @@ const questionBank = {
     },
 
     {
+      id: 'q_smoking_cigarettes',
+      module: 'core',
+      type: 'numeric',
+      label: 'Цигари на ден',
+      text: 'Приблизително колко цигари на ден пушите?',
+      helpText: 'Ако броят варира, въведете средна стойност.',
+      required: true,
+      unit: 'цигари/ден',
+      validation: { min: 1, max: 80, message: 'Моля, проверете стойността. Изглежда необичайна.' },
+      showIf: { question: 'q_smoking', value: 'current' },
+    },
+
+    {
       id: 'q_alcohol',
       module: 'core',
       type: 'single_choice',
@@ -686,8 +668,8 @@ const questionBank = {
       required: true,
       options: [
         { value: 'none',       label: 'Не употребявам алкохол' },
-        { value: 'occasional', label: 'Рядко (1–2 пъти/месец)' },
-        { value: 'moderate',   label: 'Умерено (1–3 пъти/седмица)' },
+        { value: 'occasional', label: 'Рядко (1-2 пъти/месец)' },
+        { value: 'moderate',   label: 'Умерено (1-3 пъти/седмица)' },
         { value: 'frequent',   label: 'Редовно (повечето дни)' },
       ],
       scoring: [
@@ -696,7 +678,7 @@ const questionBank = {
           domain: 'metabolic_risk',
           points: 2,
           tags: ['heavy_alcohol'],
-          safetyNote: 'Честа алкохолна употреба — чернодробна и метаболитна оценка.',
+          safetyNote: 'Честа алкохолна употреба - чернодробна и метаболитна оценка.',
           triggerModules: ['metabolic'],
           reason: 'Честа алкохолна употреба',
         },
@@ -713,10 +695,10 @@ const questionBank = {
       required: true,
       options: [
         { value: 'sedentary', label: 'Заседнал начин на живот (почти без упражнения)' },
-        { value: 'light',     label: 'Лека активност (1–2 пъти/седмица)' },
-        { value: 'moderate',  label: 'Умерена активност (3–4 пъти/седмица)' },
+        { value: 'light',     label: 'Лека активност (1-2 пъти/седмица)' },
+        { value: 'moderate',  label: 'Умерена активност (3-4 пъти/седмица)' },
         { value: 'active',    label: 'Активен/а (5+ пъти/седмица)' },
-        { value: 'athlete',   label: 'Спортист — тренирам интензивно' },
+        { value: 'athlete',   label: 'Спортист - тренирам интензивно' },
       ],
       scoring: [
         {
@@ -763,7 +745,7 @@ const questionBank = {
           points: 1,
           tags: ['low_energy'],
           triggerModules: ['mitochondrial'],
-          reason: 'Умерена умора (4–5/10)',
+          reason: 'Умерена умора (4-5/10)',
         },
       ],
     },
@@ -829,6 +811,19 @@ const questionBank = {
         { value: 'alzheimer_family',           label: 'Болест на Алцхаймер или деменция' },
         { value: 'none', label: 'Не знам / Нямам такива случаи', exclusive: true },
       ],
+      followUps: [
+        {
+          ifIncludesAny: [
+            'premature_heart_disease',
+            'high_cholesterol_family',
+            'diabetes_family',
+            'cancer_family',
+            'kidney_disease_family',
+            'alzheimer_family',
+          ],
+          questions: ['q_family_history_details'],
+        },
+      ],
       scoring: [
         {
           condition: { type: 'includes', value: 'premature_heart_disease' },
@@ -861,6 +856,35 @@ const questionBank = {
           tags: ['family_kidney_disease'],
           reason: 'Фамилна бъбречна болест',
         },
+      ],
+    },
+
+    {
+      id: 'q_family_history_details',
+      module: 'core',
+      type: 'repeatable_group',
+      label: 'Детайли за семейна история',
+      text: 'Ако желаете, добавете повече информация за засегнатите близки роднини.',
+      helpText: 'Попълнете само това, което знаете и се чувствате комфортно да споделите. Можете да добавите по един запис за всеки роднина.',
+      required: false,
+      showIf: {
+        question: 'q_family_history',
+        value: [
+          'premature_heart_disease',
+          'high_cholesterol_family',
+          'diabetes_family',
+          'cancer_family',
+          'kidney_disease_family',
+          'alzheimer_family',
+        ],
+      },
+      fields: [
+        { id: 'relation', label: 'Роднина (напр. майка, баща, брат/сестра)', type: 'text', required: true },
+        { id: 'condition', label: 'Заболяване или диагноза', type: 'text', required: false },
+        { id: 'age_at_diagnosis', label: 'Приблизителна възраст при диагнозата, ако е известна', type: 'text', required: false },
+        { id: 'current_status', label: 'Доколкото знаете, как е роднината в момента?', type: 'text', required: false },
+        { id: 'age_at_passing', label: 'Ако роднината е починал/а, приблизителна възраст (по желание)', type: 'text', required: false },
+        { id: 'notes', label: 'Допълнителни бележки, ако желаете', type: 'text', required: false },
       ],
     },
 
@@ -913,7 +937,7 @@ const questionBank = {
       type: 'yes_no',
       label: 'Стомашно-чревни оплаквания',
       text: 'Имате ли редовни стомашно-чревни оплаквания?',
-      helpText: 'Например: болки в корема, подуване, диария, запек — повечето от дните в седмицата.',
+      helpText: 'Например: болки в корема, подуване, диария, запек - повечето от дните в седмицата.',
       required: false,
       scoring: [
         {
@@ -934,7 +958,7 @@ const questionBank = {
       type: 'file_upload',
       label: 'Прикачване на документи',
       text: 'Желаете ли да прикачите лабораторни резултати или медицински документи?',
-      helpText: 'За MVP прототипа не качвайте реални лични данни. Само имената на файловете ще бъдат запазени в паметта на браузъра.',
+      helpText: 'Ако имате готови резултати, можете да ги добавите за лична ориентация по време на попълването.',
       required: false,
     },
 
@@ -952,7 +976,7 @@ const questionBank = {
       required: false,
       options: [
         { value: 'normal',   label: 'Нормално (< 130/80)' },
-        { value: 'elevated', label: 'Леко повишено (130–139 / 80–89)' },
+        { value: 'elevated', label: 'Леко повишено (130-139 / 80-89)' },
         { value: 'high',     label: 'Повишено (≥ 140/90)' },
         { value: 'unknown',  label: 'Не знам' },
       ],
@@ -1010,7 +1034,7 @@ const questionBank = {
           domain: 'cardiometabolic_risk',
           points: 3,
           tags: ['angina_symptoms', 'red_flag'],
-          safetyNote: 'Съобщени гръдни симптоми при натоварване — необходима кардиологична оценка преди програма.',
+          safetyNote: 'Съобщени гръдни симптоми при натоварване - необходима кардиологична оценка преди програма.',
           redFlag: true,
           reason: 'Гръдни симптоми при натоварване',
         },
@@ -1038,7 +1062,7 @@ const questionBank = {
       type: 'yes_no_unknown',
       label: 'ApoB и Lp(a)',
       text: 'Имате ли правени изследвания за ApoB или Lp(a)?',
-      helpText: 'Тези маркери дават по-пълна картина на сърдечно-съдовия риск — особено при фамилна история.',
+      helpText: 'Тези маркери дават по-пълна картина на сърдечно-съдовия риск - особено при фамилна история.',
       required: false,
       scoring: [
         {
@@ -1102,7 +1126,7 @@ const questionBank = {
           points: 2,
           tags: ['fatty_liver'],
           packages: ['metabolic_extended'],
-          safetyNote: 'Мастен черен дроб — чернодробни ензими и ехографска оценка.',
+          safetyNote: 'Мастен черен дроб - чернодробни ензими и ехографска оценка.',
           reason: 'Мастен черен дроб (стеатоза)',
         },
       ],
@@ -1152,7 +1176,7 @@ const questionBank = {
           domain: 'sleep_risk',
           points: 2,
           tags: ['sleep_deprivation'],
-          reason: 'Недостатъчен сън (5–6 часа)',
+          reason: 'Недостатъчен сън (5-6 часа)',
         },
       ],
     },
@@ -1163,7 +1187,7 @@ const questionBank = {
       type: 'yes_no',
       label: 'Хъркане',
       text: 'Някой казвал ли Ви е, че хъркате силно или че спирате да дишате по време на сън?',
-      helpText: 'Тази информация отваря sleep модула само когато има логическа причина за оценка на съня.',
+      helpText: 'Тази информация помага на екипа да прецени дали е нужна по-подробна оценка на съня.',
       required: false,
       scoring: [
         {
@@ -1226,7 +1250,7 @@ const questionBank = {
       text: 'Как бихте описали редовността на чревната си функция?',
       required: false,
       options: [
-        { value: 'regular',      label: 'Редовно (1–2 пъти/ден)' },
+        { value: 'regular',      label: 'Редовно (1-2 пъти/ден)' },
         { value: 'irregular',    label: 'Нерегулярно' },
         { value: 'constipation', label: 'Преобладаващо запек' },
         { value: 'diarrhea',     label: 'Преобладаваща диария' },
@@ -1379,7 +1403,7 @@ const questionBank = {
         {
           condition: { type: 'in', values: ['yes', 'unknown'] },
           tags: ['hormone_therapy_interest'],
-          safetyNote: 'Интерес към хормонална терапия — преглед на индикации, рискове и базова хормонална панел.',
+          safetyNote: 'Интерес към хормонална терапия - преглед на индикации, рискове и базова хормонална панел.',
           reason: 'Текуща или планирана хормонална терапия',
         },
       ],
@@ -1423,24 +1447,15 @@ const questionBank = {
       id: 'q_cancer_details',
       module: 'cancer_family',
       type: 'repeatable_group',
-      label: 'Фамилна онкологична история',
-      text: 'Въведете детайли за онкологични заболявания в семейството (незадължително):',
-      helpText: 'Включете само биологични роднини. Повторете за всеки засегнат.',
+      label: 'Лична онкологична история',
+      text: 'Ако желаете, добавете детайли за онкологично заболяване, което сте имали или проследявате.',
+      helpText: 'Попълнете само информация, която се чувствате комфортно да споделите.',
       required: false,
+      showIf: { question: 'q_conditions', value: 'cancer_history' },
       fields: [
-        { id: 'cancer_relation', label: 'Роднина',                  type: 'text', required: true },
         { id: 'cancer_type',     label: 'Вид рак',                   type: 'text', required: true },
         { id: 'cancer_age',      label: 'Възраст при диагнозата',    type: 'text', required: false },
-      ],
-      scoring: [
-        {
-          condition: { type: 'entries_gte', count: 2 },
-          domain: 'cancer_risk',
-          points: 2,
-          tags: ['multiple_family_cancer'],
-          packages: ['cancer_prevention'],
-          reason: 'Множество роднини с онкологично заболяване',
-        },
+        { id: 'cancer_status',   label: 'Текущ статус или проследяване', type: 'text', required: false },
       ],
     },
 
@@ -1535,7 +1550,7 @@ const questionBank = {
           points: 2,
           tags: ['frequent_NSAID_use', 'kidney_review_required'],
           packages: ['renal_assessment'],
-          safetyNote: 'Честа употреба на НСПВС — бъбречен мониторинг е препоръчан.',
+          safetyNote: 'Честа употреба на НСПВС - бъбречен мониторинг е препоръчан.',
           reason: 'Честа употреба на НСПВС',
         },
       ],
@@ -1562,7 +1577,7 @@ const questionBank = {
           points: 3,
           tags: ['kidney_symptoms', 'red_flag', 'kidney_review_required'],
           packages: ['renal_assessment'],
-          safetyNote: 'Симптоми, насочващи към бъбречна патология — необходима лекарска оценка преди програма.',
+          safetyNote: 'Симптоми, насочващи към бъбречна патология - необходима лекарска оценка преди програма.',
           redFlag: true,
           reason: 'Симптоми, насочващи към бъбречна патология',
         },

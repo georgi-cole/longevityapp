@@ -5,7 +5,7 @@ Collects structured client information before the first consultation, dynamicall
 opens relevant follow-up modules, calculates internal risk/domain signals,
 and generates a clinician-facing summary with recommended diagnostic packages.
 
-> **⚠️ Prototype — Not a medical device.**  
+> **⚠️ Prototype - Not a medical device.**  
 > This app does not diagnose, prescribe, or tell patients they have a disease.
 > It collects information, identifies signals, and prepares a clinician review summary.  
 > **Do not use with real patient data in the public prototype.**
@@ -16,11 +16,11 @@ and generates a clinician-facing summary with recommended diagnostic packages.
 
 ```
 longevityapp/
-├── index.html        — App shell, three-view layout (intake / completion / clinician)
-├── styles.css        — Premium medical visual design
-├── app.js            — All application logic (state, rendering, scoring, summary)
-├── questionBank.js   — Source of truth: questions, modules, packages, scoring rules
-└── README.md         — This file
+├── index.html        - App shell, three-view layout (intake / completion / clinician)
+├── styles.css        - Premium medical visual design
+├── app.js            - All application logic (state, rendering, scoring, summary)
+├── questionBank.js   - Source of truth: questions, modules, packages, scoring rules
+└── README.md         - This file
 ```
 
 ### How the files relate
@@ -30,7 +30,7 @@ longevityapp/
 | `questionBank.js` | Defines every question, module, package, scoring rule, and trigger rule. Edit this file to change the clinical content. |
 | `app.js` | Reads `questionBank` and drives the adaptive flow. Handles state, rendering, scoring, trigger engine, navigation, and clinician summary generation. |
 | `index.html` | HTML skeleton with three `<section>` views and `<script>` tags to load the two JS files. |
-| `styles.css` | All styles — white background, teal/blue/green palette, rounded cards, shadows. |
+| `styles.css` | All styles - white background, teal/blue/green palette, rounded cards, shadows. |
 
 ---
 
@@ -57,7 +57,7 @@ npx serve .
 1. Push all four files to the root of a GitHub repository (or a `docs/` folder).
 2. In the repository **Settings → Pages**, set the source branch to `main` (or the relevant branch) and the folder to `/ (root)` (or `/docs`).
 3. GitHub Pages will serve `index.html` automatically.
-4. The app is fully static — no server, no API keys, no database required.
+4. The app is fully static - no server, no API keys, no database required.
 
 ---
 
@@ -115,7 +115,7 @@ Array of question objects. Each question may have:
 | `text` | string | Full question text shown to patient |
 | `helpText` | string | Optional help text below the question |
 | `required` | boolean | Validation: must answer before advancing |
-| `options` | array | For choice questions — `{ value, label, exclusive? }` |
+| `options` | array | For choice questions - `{ value, label, exclusive? }` |
 | `fields` | array | For `lab_values` / `repeatable_group` |
 | `unit` | string | Unit suffix for numeric inputs |
 | `validation` | object | `{ min, max, message }` or `{ minAge, maxAge }` |
@@ -133,11 +133,11 @@ Array of question objects. Each question may have:
 | `yes_no` | Two-button Да/Не |
 | `yes_no_unknown` | Three-button Да/Не/Не знам |
 | `numeric` | Number input with unit and range validation |
-| `scale` | 0–10 scale |
+| `scale` | 0-10 scale |
 | `date` | Date picker with age validation |
 | `lab_values` | Grid of optional lab fields |
 | `repeatable_group` | Add/remove entries (medications, family history, etc.) |
-| `file_upload` | File name capture only — no server upload |
+| `file_upload` | File name capture only - no server upload |
 
 ### Scoring rule structure
 
@@ -145,7 +145,7 @@ Array of question objects. Each question may have:
 {
   condition: { type: 'includes', value: 'high_blood_pressure' },
   domain: 'cardiometabolic_risk',  // domain to add points to
-  points: 2,                        // 1–4 (capped at 4 per domain)
+  points: 2,                        // 1-4 (capped at 4 per domain)
   tags: ['hypertension'],           // internal tags
   packages: ['cardiometabolic_standard'], // suggest these packages
   triggerModules: ['cardiometabolic'],    // open these modules
@@ -167,7 +167,7 @@ Array of question objects. Each question may have:
 | `between` | `{ type: 'between', min: 4, max: 5 }` |
 | `age_gte` | `{ type: 'age_gte', value: 50 }` |
 | `bmi_gte` | `{ type: 'bmi_gte', value: 30 }` |
-| `waist_elevated_male/female` | No extra fields — uses sex from `q_sex` |
+| `waist_elevated_male/female` | No extra fields - uses sex from `q_sex` |
 | `all_empty` | True if all lab fields are empty |
 | `has_entries` | True if repeatable_group has ≥ 1 entry |
 | `entries_gte` | `{ type: 'entries_gte', count: 2 }` |

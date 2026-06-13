@@ -1,4 +1,4 @@
-// app.js — Smart Longevity Intake
+// app.js - Smart Longevity Intake
 // All application logic lives here. Edit questionBank.js to change medical content.
 
 'use strict';
@@ -33,6 +33,7 @@ const state = {
   history: [],               // stack of question indices for Back navigation
   physicianFirstRequired: false,
   uploadedFiles: [],
+  validationWarnings: {},
   currentView: 'intake',     // 'intake' | 'patient_complete' | 'clinician'
 };
 
@@ -300,6 +301,11 @@ function shouldShowQuestion(question) {
   if (!question.showIf) return true;
   const { question: sourceId, value } = question.showIf;
   const answer = state.answers[sourceId];
+  if (Array.isArray(answer)) {
+    return Array.isArray(value)
+      ? value.some(v => answer.includes(v))
+      : answer.includes(value);
+  }
   if (Array.isArray(value)) {
     return value.includes(answer);
   }
@@ -311,7 +317,14 @@ function shouldShowQuestion(question) {
 function insertFollowUps(question, answer) {
   if (!question.followUps) return;
   for (const fu of question.followUps) {
-    if (fu.ifValue !== answer) continue;
+    let shouldInsert = fu.ifValue === answer;
+    if (!shouldInsert && Array.isArray(answer)) {
+      if (fu.ifIncludes) shouldInsert = answer.includes(fu.ifIncludes);
+      if (!shouldInsert && fu.ifIncludesAny) {
+        shouldInsert = fu.ifIncludesAny.some(v => answer.includes(v));
+      }
+    }
+    if (!shouldInsert) continue;
     const insertIdx = state.currentQuestionIndex + 1;
     fu.questions.forEach((qId, i) => {
       if (!state.activeQuestionQueue.includes(qId)) {
@@ -333,16 +346,29 @@ function validateAnswer(question, answer) {
     }
   }
 
+  function addUnusualValueError() {
+    const valueKey = String(answer);
+    const previous = state.validationWarnings[question.id];
+    const count = previous && previous.value === valueKey ? previous.count : 0;
+    if (count === 0) {
+      state.validationWarnings[question.id] = { value: valueKey, count: 1 };
+      errors.push(question.validation.message || 'Моля, проверете стойността. Изглежда необичайна.');
+    } else if (count === 1) {
+      state.validationWarnings[question.id] = { value: valueKey, count: 2 };
+      errors.push('На път сте да потвърдите тази стойност. Моля, натиснете Напред, за да продължите, или коригирайте стойността.');
+    }
+  }
+
   if (question.type === 'numeric' && answer !== '' && answer !== null && answer !== undefined) {
     const num = parseFloat(answer);
     if (isNaN(num)) {
       errors.push('Моля, въведете валидна числова стойност.');
     } else if (question.validation) {
       if (question.validation.min !== undefined && num < question.validation.min) {
-        errors.push(question.validation.message || 'Моля, проверете стойността. Изглежда необичайна.');
+        addUnusualValueError();
       }
       if (question.validation.max !== undefined && num > question.validation.max) {
-        errors.push(question.validation.message || 'Моля, проверете стойността. Изглежда необичайна.');
+        addUnusualValueError();
       }
     }
   }
@@ -363,7 +389,7 @@ function validateAnswer(question, answer) {
         errors.push(`Минималната възраст е ${question.validation.minAge} години.`);
       }
       if (question.validation.maxAge && age > question.validation.maxAge) {
-        errors.push(question.validation.message || 'Моля, проверете стойността. Изглежда необичайна.');
+        addUnusualValueError();
       }
     }
   }
@@ -391,6 +417,10 @@ function recomputeDerivedState() {
 
 function handleAnswer(questionId, answer) {
   state.answers[questionId] = answer;
+  const warning = state.validationWarnings[questionId];
+  if (warning && warning.value !== String(answer)) {
+    delete state.validationWarnings[questionId];
+  }
   recomputeDerivedState();
   evaluateTriggerRules(questionId);
 }
@@ -418,8 +448,8 @@ function goNext() {
   }
   clearValidationErrors();
 
-  // Process follow-ups for single_choice and yes_no
-  if (['yes_no', 'single_choice'].includes(question.type) && answer) {
+  // Process follow-ups
+  if (['yes_no', 'single_choice', 'multi_choice'].includes(question.type) && answer) {
     insertFollowUps(question, answer);
   }
 
@@ -517,7 +547,7 @@ function buildClinicianSummary() {
   const age = calculateAge(state.answers['q_dob']);
   const bmi = calculateBMI();
   const sex = state.answers['q_sex'];
-  const sexLabel = { male: 'Мъж', female: 'Жена', prefer_not_to_say: 'Не уточнено' }[sex] || '—';
+  const sexLabel = { male: 'Мъж', female: 'Жена', prefer_not_to_say: 'Не уточнено' }[sex] || '-';
 
   const domainLevels = {};
   Object.entries(state.domainScores).forEach(([d, score]) => {
@@ -543,12 +573,12 @@ function buildClinicianSummary() {
   return {
     timestamp: new Date().toISOString(),
     clientSnapshot: {
-      age: age !== null ? age : '—',
+      age: age !== null ? age : '-',
       sex: sexLabel,
-      height: state.answers['q_height'] ? `${state.answers['q_height']} cm` : '—',
-      weight: state.answers['q_weight'] ? `${state.answers['q_weight']} kg` : '—',
-      bmi: bmi ? bmi.toFixed(1) : '—',
-      waist: state.answers['q_waist'] ? `${state.answers['q_waist']} cm` : '—',
+      height: state.answers['q_height'] ? `${state.answers['q_height']} cm` : '-',
+      weight: state.answers['q_weight'] ? `${state.answers['q_weight']} kg` : '-',
+      bmi: bmi ? bmi.toFixed(1) : '-',
+      waist: state.answers['q_waist'] ? `${state.answers['q_waist']} cm` : '-',
     },
     primaryGoals: state.answers['q_goals'] || [],
     redFlags: state.redFlags,
@@ -739,11 +769,23 @@ function renderSingleChoice(q) {
 
 // ── Render: multi_choice ─────────────────────────────────────────────────────
 function renderMultiChoice(q) {
-  const opts = (q.options || []).map(opt => `
-    <label class="option-card" data-value="${esc(opt.value)}" data-exclusive="${opt.exclusive ? 'true' : 'false'}">
-      <input type="checkbox" name="${esc(q.id)}" value="${esc(opt.value)}" ${opt.exclusive ? 'data-exclusive="true"' : ''} />
-      <span class="option-text">${esc(opt.label)}</span>
-    </label>`).join('');
+  const opts = (q.options || []).map(opt => {
+    const freeTextKey = `${q.id}_${opt.value}_text`;
+    return `
+      <div class="multi-option">
+        <label class="option-card" data-value="${esc(opt.value)}" data-exclusive="${opt.exclusive ? 'true' : 'false'}">
+          <input type="checkbox" name="${esc(q.id)}" value="${esc(opt.value)}" ${opt.exclusive ? 'data-exclusive="true"' : ''} ${opt.freeText ? `data-free-text-key="${esc(freeTextKey)}"` : ''} />
+          <span class="option-text">${esc(opt.label)}</span>
+        </label>
+        ${opt.freeText ? `
+          <div class="option-free-text" data-free-text-wrap="${esc(opt.value)}" hidden>
+            <label for="free-${esc(freeTextKey)}">${esc(opt.freeTextLabel || 'Моля, уточнете:')}</label>
+            <input id="free-${esc(freeTextKey)}" class="text-input option-free-input" type="text"
+              data-free-text-input="${esc(opt.value)}" data-free-text-key="${esc(freeTextKey)}"
+              placeholder="${esc(opt.freeTextPlaceholder || '')}" autocomplete="off" />
+          </div>` : ''}
+      </div>`;
+  }).join('');
 
   return `
     <div class="question-card">
@@ -924,9 +966,6 @@ function renderFileUpload(q) {
     <div class="question-card">
       <p class="question-module-hint">${moduleHint(q)}</p>
       <h2 class="question-title">${esc(q.text)}</h2>
-      <div class="privacy-warning">
-        ⚠️ За MVP прототипа не качвайте реални лични данни.
-      </div>
       ${q.helpText ? `<p class="question-help">${esc(q.helpText)}</p>` : ''}
       <input type="file" id="file-input-${esc(q.id)}" multiple class="file-input-hidden" aria-label="Изберете файлове" />
       <label for="file-input-${esc(q.id)}" class="btn-file-choose">Изберете файлове</label>
@@ -996,6 +1035,12 @@ function attachQuestionListeners(question) {
       }
 
       const selected = Array.from(allCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
+      allCheckboxes.forEach(cb => {
+        const freeTextKey = cb.dataset.freeTextKey;
+        const freeTextWrap = container.querySelector(`[data-free-text-wrap="${cb.value}"]`);
+        if (freeTextWrap) freeTextWrap.hidden = !cb.checked;
+        if (freeTextKey && !cb.checked) delete state.answers[freeTextKey];
+      });
       handleAnswer(question.id, selected);
 
       // Update card active states
@@ -1003,6 +1048,12 @@ function attachQuestionListeners(question) {
         const cb = card.querySelector('input[type="checkbox"]');
         card.classList.toggle('selected', cb && cb.checked);
       });
+    });
+  });
+
+  container.querySelectorAll('.option-free-input').forEach(input => {
+    input.addEventListener('input', () => {
+      handleAnswer(input.dataset.freeTextKey, input.value);
     });
   });
 
@@ -1168,6 +1219,12 @@ function restoreAnswer(question) {
     container.querySelectorAll(`input[type="checkbox"][name="${question.id}"]`).forEach(cb => {
       cb.checked = answer.includes(cb.value);
       cb.closest('.option-card')?.classList.toggle('selected', cb.checked);
+      const freeTextWrap = container.querySelector(`[data-free-text-wrap="${cb.value}"]`);
+      if (freeTextWrap) freeTextWrap.hidden = !cb.checked;
+    });
+    container.querySelectorAll('.option-free-input').forEach(input => {
+      const val = state.answers[input.dataset.freeTextKey];
+      if (val !== undefined) input.value = val;
     });
   }
 
@@ -1212,8 +1269,8 @@ function renderPatientCompletionScreen() {
         <h1 class="completion-title">Благодарим Ви!</h1>
         <p class="completion-subtitle">Вашият предварителен профил е създаден успешно.</p>
         <p class="completion-body">
-          На база отговорите Ви екипът ще прегледа основните направления и ще предложи
-          най-подходящия диагностичен път по време на консултацията.
+          На база Вашите отговори ще бъде изготвен персонализиран профил,
+          съобразен с Вашите цели и индивидуални показатели.
         </p>
         ${msgHtml}
         ${categories.length > 0 ? `
@@ -1222,17 +1279,12 @@ function renderPatientCompletionScreen() {
             <ul>${catHtml}</ul>
           </div>` : ''}
         <p class="completion-next">
-          <strong>Следваща стъпка:</strong> Нашият екип ще се свърже с Вас, за да потвърди часа на консултацията и да отговори на допълнителни въпроси.
+          Нашият екип ще се свърже с Вас, за да потвърди часа на консултацията.
         </p>
         <p class="disclaimer">
-          ⚠️ Това не е медицинска диагноза. Събраната информация е предназначена единствено за подготовка на клиничния екип.
+          ⚠️ Това не е медицинска диагноза. Събраната информация е предназначена единствено за индивидуално профилиране и създаване на персонализиран план.
         </p>
-        <button class="btn-primary" id="btn-view-clinician">Виж обобщение за клинициста</button>
       </div>`;
-    el('#btn-view-clinician')?.addEventListener('click', () => {
-      state.currentView = 'clinician';
-      renderClinicianSummary();
-    });
   }
 }
 
@@ -1296,7 +1348,7 @@ function renderClientSnapshot(s) {
 function renderRedFlagBanner() {
   return `
     <div class="red-flag-banner">
-      ⚠️ КЛИНИЦИСТ — НЕОБХОДИМ ПРЕГЛЕД ПРЕДИ СТАНДАРТНА ПРОГРАМА
+      ⚠️ КЛИНИЦИСТ - НЕОБХОДИМ ПРЕГЛЕД ПРЕДИ СТАНДАРТНА ПРОГРАМА
     </div>`;
 }
 
@@ -1311,7 +1363,7 @@ function renderDomainSection(s) {
       <div class="domain-row">
         <div class="domain-header">
           <span class="domain-label">${esc(label)}</span>
-          <span class="domain-badge" style="background:${lvl.color}">${score}/4 — ${esc(lvl.label)}</span>
+          <span class="domain-badge" style="background:${lvl.color}">${score}/4 - ${esc(lvl.label)}</span>
         </div>
         ${reasons ? `<ul class="domain-reasons">${reasons}</ul>` : ''}
       </div>`;
@@ -1398,7 +1450,9 @@ function renderRawAnswersSection(s) {
 
   const rows = entries.map(([qId, val]) => {
     const q = getQuestionById(qId);
-    const label = q ? q.label : qId;
+    const otherMatch = qId.match(/^(.*)_other_text$/);
+    const parentQuestion = otherMatch ? getQuestionById(otherMatch[1]) : null;
+    const label = q ? q.label : parentQuestion ? `${parentQuestion.label} - Друго` : qId;
     let displayVal = '';
 
     if (Array.isArray(val)) {
