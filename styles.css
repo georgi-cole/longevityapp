@@ -44,10 +44,13 @@ html { font-size: 16px; -webkit-text-size-adjust: 100%; }
 
 body {
   font-family: var(--font-sans);
-  background: var(--color-bg);
+  background: linear-gradient(180deg, #f8fbfc 0%, #eef4f7 100%);
   color: var(--color-text);
   line-height: 1.6;
-  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 a { color: var(--color-primary); text-decoration: none; }
@@ -63,12 +66,13 @@ p  { line-height: 1.65; }
 #app {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
 }
 
 /* ── Header ────────────────────────────────────────────────────────────────── */
 .site-header {
-  background: var(--color-surface);
+  background: rgba(255, 255, 255, 0.94);
   border-bottom: 1px solid var(--color-border);
   padding: 0 1.5rem;
   height: 64px;
@@ -79,6 +83,7 @@ p  { line-height: 1.65; }
   top: 0;
   z-index: 100;
   box-shadow: 0 1px 4px var(--color-shadow);
+  backdrop-filter: blur(14px);
 }
 
 .logo {
@@ -103,6 +108,7 @@ p  { line-height: 1.65; }
   font-weight: 700;
   color: var(--color-text);
   letter-spacing: -0.02em;
+  white-space: nowrap;
 }
 .logo-text span { color: var(--color-primary); }
 
@@ -128,12 +134,13 @@ p  { line-height: 1.65; }
 
 /* ── Progress bar ──────────────────────────────────────────────────────────── */
 .progress-wrapper {
-  background: var(--color-surface);
+  background: rgba(255, 255, 255, 0.94);
   border-bottom: 1px solid var(--color-border);
   padding: 0.6rem 1.5rem;
   display: flex;
   align-items: center;
   gap: 1rem;
+  backdrop-filter: blur(14px);
 }
 .module-label {
   font-size: 0.75rem;
@@ -169,6 +176,7 @@ p  { line-height: 1.65; }
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100%;
   padding: 2.5rem 1rem 4rem;
 }
 
@@ -546,7 +554,7 @@ p  { line-height: 1.65; }
 .nav-buttons {
   display: flex;
   gap: 0.75rem;
-  justify-content: flex-end;
+  justify-content: center;
   align-items: center;
 }
 
@@ -800,12 +808,13 @@ p  { line-height: 1.65; }
 
 /* ── Footer ─────────────────────────────────────────────────────────────────── */
 .site-footer {
-  background: var(--color-surface);
+  background: rgba(255, 255, 255, 0.94);
   border-top: 1px solid var(--color-border);
   padding: 1rem 1.5rem;
   text-align: center;
   font-size: 0.78rem;
   color: var(--color-text-subtle);
+  backdrop-filter: blur(14px);
 }
 
 /* ── Responsive ─────────────────────────────────────────────────────────────── */
@@ -823,4 +832,254 @@ p  { line-height: 1.65; }
 @media (max-width: 400px) {
   .snapshot-grid { grid-template-columns: repeat(2, 1fr); }
   .yn-row .option-card { max-width: 100%; }
+}
+
+@media (max-width: 900px) {
+  .site-header {
+    padding: 0 1rem;
+  }
+
+  .kolequant-logo {
+    max-width: 128px;
+    margin-right: 0.75rem;
+  }
+
+  .progress-wrapper {
+    padding: 0.65rem 1rem;
+    gap: 0.75rem;
+  }
+
+  .module-label {
+    min-width: 140px;
+  }
+
+  .main-content {
+    padding-left: 0.85rem;
+    padding-right: 0.85rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .site-header {
+    height: auto;
+    min-height: 56px;
+    padding: 0.75rem 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.45rem 0.75rem;
+  }
+
+  .logo {
+    flex: 1 1 auto;
+    min-width: 0;
+    gap: 0.5rem;
+  }
+
+  .logo-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .logo-text {
+    font-size: 0.92rem;
+    line-height: 1.1;
+  }
+
+  .kolequant-logo,
+  .header-badge {
+    display: none;
+  }
+
+  .progress-wrapper {
+    position: sticky;
+    top: 56px;
+    z-index: 90;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "module label"
+      "bar bar";
+    row-gap: 0.35rem;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    gap: 0.5rem 0.75rem;
+  }
+
+  .module-label {
+    grid-area: module;
+    min-width: 0;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+  }
+
+  .progress-bar-track {
+    grid-area: bar;
+    width: 100%;
+    height: 5px;
+  }
+
+  .progress-label {
+    grid-area: label;
+    font-size: 0.7rem;
+    justify-self: end;
+  }
+
+  .main-content {
+    padding: 1rem 0.9rem 1rem;
+  }
+
+  #view-intake {
+    gap: 1rem;
+    padding-bottom: calc(7.25rem + env(safe-area-inset-bottom));
+  }
+
+  .question-card {
+    padding: 1.25rem 1rem;
+    border-radius: 20px;
+  }
+
+  .question-title {
+    font-size: 1.1rem;
+  }
+
+  .question-help {
+    font-size: 0.84rem;
+    margin-bottom: 1rem;
+  }
+
+  .multi-hint {
+    margin-bottom: 0.65rem;
+  }
+
+  .options-list {
+    gap: 0.5rem;
+  }
+
+  .option-card {
+    padding: 0.7rem 0.85rem;
+    gap: 0.6rem;
+  }
+
+  .option-text {
+    font-size: 0.92rem;
+  }
+
+  .yn-row .option-card {
+    flex: 1 1 0;
+    max-width: none;
+  }
+
+  .scale-container {
+    gap: 0.2rem;
+  }
+
+  .scale-tick span {
+    width: 32px;
+    height: 32px;
+    font-size: 0.8rem;
+  }
+
+  .text-input {
+    font-size: 16px;
+  }
+
+  .input-with-unit,
+  .date-input {
+    max-width: 100%;
+  }
+
+  .lab-values-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rep-entry {
+    flex-direction: column;
+  }
+
+  .rep-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .btn-remove-entry {
+    align-self: flex-end;
+  }
+
+  .btn-file-choose {
+    width: 100%;
+    text-align: center;
+  }
+
+  .summary-section {
+    padding: 1.25rem 1rem;
+  }
+
+  .completion-card {
+    padding: 1.75rem 1.25rem;
+  }
+
+  .clinician-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .snapshot-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .nav-buttons {
+    position: fixed;
+    left: 0.9rem;
+    right: 0.9rem;
+    bottom: calc(0.9rem + env(safe-area-inset-bottom));
+    z-index: 120;
+    padding: 0.75rem;
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    border-radius: 20px;
+    background: rgba(248, 250, 251, 0.88);
+    backdrop-filter: blur(18px);
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.14);
+    gap: 0.6rem;
+  }
+
+  .nav-buttons > button {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 48px;
+    padding: 0.8rem 1rem;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    font-size: 0.92rem;
+    border-radius: 16px;
+  }
+
+  .site-footer {
+    display: none;
+  }
+}
+
+@media (max-width: 400px) {
+  .progress-wrapper {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "module"
+      "bar"
+      "label";
+  }
+
+  .progress-label {
+    justify-self: start;
+  }
+
+  .snapshot-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .yn-row .option-card {
+    max-width: 100%;
+  }
 }
