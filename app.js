@@ -1257,10 +1257,13 @@ function restoreAnswer(question) {
 function renderPatientCompletionScreen() {
   const view = el('#view-intake');
   const completionView = el('#view-patient-complete');
+  const clinicianView = el('#view-clinician');
   const progressWrapper = el('#progress-wrapper');
   if (view) view.hidden = true;
   if (progressWrapper) progressWrapper.hidden = true;
+  if (clinicianView) clinicianView.hidden = true;
   if (completionView) completionView.hidden = false;
+  state.currentView = 'patient_complete';
 
   const categories = buildPatientFacingCategories();
   const catHtml = categories.length > 0
@@ -1302,10 +1305,15 @@ function renderPatientCompletionScreen() {
 // ── Clinician summary renderer ───────────────────────────────────────────────
 
 function renderClinicianSummary() {
+  const view = el('#view-intake');
   const completionView = el('#view-patient-complete');
   const clinicianView = el('#view-clinician');
+  const progressWrapper = el('#progress-wrapper');
+  if (view) view.hidden = true;
+  if (progressWrapper) progressWrapper.hidden = true;
   if (completionView) completionView.hidden = true;
   if (clinicianView) clinicianView.hidden = false;
+  state.currentView = 'clinician';
 
   const summary = buildClinicianSummary();
   const container = el('#clinician-content');
@@ -1325,8 +1333,9 @@ function renderClinicianSummary() {
 
   el('#btn-export-json')?.addEventListener('click', exportJSON);
   el('#btn-back-to-patient')?.addEventListener('click', () => {
-    clinicianView.hidden = true;
-    el('#view-patient-complete').hidden = false;
+    state.currentView = 'patient_complete';
+    if (clinicianView) clinicianView.hidden = true;
+    renderPatientCompletionScreen();
   });
 }
 
